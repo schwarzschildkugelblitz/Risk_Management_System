@@ -2,6 +2,8 @@ import numpy as np
 from scipy.stats import norm
 from scipy.stats import genextreme
 import pandas as pd
+import scipy.stats as stats
+import copulas
 import arch
 
 class RiskManagementModel:
@@ -176,6 +178,19 @@ class RiskManagementModel:
         return var
 
     def garch_var(self, confidence_level):
+        """
+        Calculates the GARCH VaR of the portfolio based on the confidence level.
+        
+        Parameters:
+        -----------
+        confidence_level : float
+            The confidence level of the VaR calculation, e.g. 0.95.
+        
+        Returns:
+        --------
+        float
+            The VaR of the portfolio based on the GARCH method.
+        """
         # Convert returns to a pandas DataFrame
         data = pd.DataFrame(self.returns, columns=['Returns'])
         
@@ -193,6 +208,20 @@ class RiskManagementModel:
         
         return var
     def copula_var(self, confidence_level):
+        """
+        Calculates the copula VaR of the portfolio based on the confidence level.
+        
+        Parameters:
+        -----------
+        confidence_level : float
+            The confidence level of the VaR calculation, e.g. 0.95.
+
+        Returns:
+        --------
+        float
+            The VaR of the portfolio based on the copula method.
+        """
+
         # Convert returns to a pandas DataFrame
         data = pd.DataFrame(self.returns, columns=['Returns'])
 
