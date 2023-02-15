@@ -1,8 +1,8 @@
 import numpy as np
 from scipy.stats import norm
 from scipy.stats import genextreme
-
-
+import pandas as pd
+import arch
 
 class RiskManagementModel:
     """
@@ -174,7 +174,7 @@ class RiskManagementModel:
         params = genextreme.fit(self.returns)
         var = genextreme.ppf(1 - confidence_level, *params)
         return var
-        
+
     def garch_var(self, confidence_level):
         # Convert returns to a pandas DataFrame
         data = pd.DataFrame(self.returns, columns=['Returns'])
@@ -190,5 +190,26 @@ class RiskManagementModel:
         # Calculate VaR at the given confidence level
         var = -1 * data['Returns'].mean() - \
               norm.ppf(1 - confidence_level) * np.sqrt(volatility)
+        
+        return var
+    def copula_var(self, confidence_level):
+        # Convert returns to a pandas DataFrame
+        data = pd.DataFrame(self.returns, columns=['Returns'])
+
+        # Fit a Gaussian copula to the data
+        copula = copulas.multivariate.GaussianCopula()
+        copula.fit(data)
+
+        # Generate Monte Carlo samples from the copula
+        num_samples = 100000
+        samples = copula.sample(num_samples)
+
+        # Transform the samples into uniform marginals
+        for col in samples.columns:
+            samples[col] = stats.rankdata(samples[col]) / (num_samples + 1)
+
+        # Calculate VaR at the given confidence level
+        var = -1 * data['Returns'].mean() - \
+              np.percentile(data['Returns'].values, 100 * confidence_level)
         
         return var
