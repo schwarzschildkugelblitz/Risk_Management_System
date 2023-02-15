@@ -1,5 +1,6 @@
-mport numpy as np
+import numpy as np
 from scipy.stats import norm
+from scipy.stats import genextreme
 
 
 
@@ -155,3 +156,39 @@ class RiskManagementModel:
         delta_portfolio_value = value * delta_market_value
         delta_var_var = - delta_portfolio_value - portfolio_volatility * np.sqrt(horizon) * norm.ppf(1 - confidence_level)
         return delta_var_var
+
+    def evt_var(self, confidence_level):
+        """
+        Calculates the EVT VaR of the portfolio based on the confidence level.
+
+        Parameters:
+        -----------
+        confidence_level : float
+            The confidence level of the VaR calculation, e.g. 0.95.
+        
+        Returns:
+        --------
+        float
+            The VaR of the portfolio based on the EVT method.
+        """
+        params = genextreme.fit(self.returns)
+        var = genextreme.ppf(1 - confidence_level, *params)
+        return var
+        
+    def garch_var(self, confidence_level):
+        # Convert returns to a pandas DataFrame
+        data = pd.DataFrame(self.returns, columns=['Returns'])
+        
+        # Fit a GARCH(1,1) model to the data
+        model = arch.arch_model(data, mean='Zero', vol='GARCH', p=1, q=1)
+        results = model.fit(disp='off')
+
+        # Forecast the volatility for the next day
+        forecasts = results.forecast(horizon=1)
+        volatility = forecasts.variance.values[-1]
+
+        # Calculate VaR at the given confidence level
+        var = -1 * data['Returns'].mean() - \
+              norm.ppf(1 - confidence_level) * np.sqrt(volatility)
+        
+        return var
