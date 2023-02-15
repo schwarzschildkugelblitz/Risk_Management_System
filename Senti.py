@@ -5,8 +5,10 @@ import matplotlib.pyplot as plt
 import snscrape.modules.twitter as sntwitter
 from datetime import date, timedelta
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import TextBlob
 
-class setnimentAnalysis:
+
+class TextualAnalysis:
     """
     This class is used to perform sentiment analysis on a given query.
     
@@ -20,7 +22,9 @@ class setnimentAnalysis:
     Methods:
         get_twitter_stock_data: Get the Twitter stock data for a given query.
         get_sentiment: Get the sentiment of a given query.
-        get_sentiment_by_date: Get the sentiment of a given query by date.
+        LDA: Perform LDA on a given query.
+        get_topic: Get the topic of a given query.
+        get_topic_sentiment: Get the sentiment of a given topic.
     """
     def __init__(self, query):
         self.query = query
@@ -169,4 +173,8 @@ class setnimentAnalysis:
         plt.ylabel('Sentiment Score')
         plt.title('Sentiment Analysis of Tweets about Python')
         plt.show()
-        
+
+    #todo LDA topic modeling for tweets
+    #todo wordcloud for tweets
+    
+
