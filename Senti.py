@@ -174,7 +174,55 @@ class TextualAnalysis:
         plt.title('Sentiment Analysis of Tweets about Python')
         plt.show()
 
-    #todo LDA topic modeling for tweets
-    #todo wordcloud for tweets
+    def load_data(file_path):
+        '''
+        Load the DataFrame containing the tweets
+        '''
+        df = pd.read_csv(file_path)
+        return df
+
+    def preprocess_text(text):
+        '''
+        Preprocess the text data
+        '''
+        result = []
+        for token in simple_preprocess(text):
+            if token not in STOPWORDS:
+                result.append(token)
+        return result
+
+    def preprocess_dataframe(df):
+        '''
+        Apply the preprocess function to the text column of the DataFrame
+        '''
+        df['processed_text'] = df['text'].apply(preprocess_text)
+        return df
+
+    def create_corpus(df):
+        '''
+        Create a dictionary and bag-of-words representation of the processed text
+        '''
+        dictionary = Dictionary(df['processed_text'])
+        corpus = [dictionary.doc2bow(text) for text in df['processed_text']]
+        return dictionary, corpus
+
+    def train_lda_model(corpus, dictionary, num_topics=10, passes=10):
+        '''
+        Train the LDA model
+        '''
+        lda_model = LdaModel(corpus=corpus,
+                            id2word=dictionary,
+                            num_topics=num_topics,
+                            passes=passes)
+        return lda_model
+
+    def visualize_topics(lda_model, corpus, dictionary):
+        '''
+        Visualize the topics using pyLDAvis
+        '''
+        vis = pyLDAvis.gensim_models.prepare(lda_model, corpus, dictionary)
+        pyLDAvis.display(vis)
+        #todo LDA topic modeling for tweets
+        #todo wordcloud for tweets
     
 
